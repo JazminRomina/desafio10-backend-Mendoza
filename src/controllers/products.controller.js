@@ -27,10 +27,12 @@ export class ProductsController {
     }
 
     addProd = async(req, res, next) => {
-        const newProduct = req.body
         try{
+            const newProduct = req.body
+            if(typeof newProduct.price !== "number" || typeof newProduct.stock !== "number"){
+                return res.status(500).json('Stock or price variable is not a number.')
+            }
             if(!newProduct.title || !newProduct.description || !newProduct.price || !newProduct.thumbnail || !newProduct.code || !newProduct.stock || !newProduct.status || !newProduct.category){
-                console.log(newProduct)
                 throw customError.createError({
                     name: "New Product",
                     cause: generateErrorProds({newProduct}),
@@ -38,6 +40,7 @@ export class ProductsController {
                     code: Errors.TYPE_INVALID
                 })
             }
+            console.log(newProduct)
             const product = await ProductService.addProducts(newProduct)
             res.send({message: 'This Product has been added', product: product})
         }
